@@ -29,7 +29,7 @@ if(BUILD_TESTING)
 endif()
 
 install(TARGETS
-  talker
+  launch
   DESTINATION lib/${PROJECT_NAME})
   
 ament_package()
