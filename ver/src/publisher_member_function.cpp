@@ -5,6 +5,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include "math.h"
+#include "std_msgs/msg/string.hpp"
 
 using namespace std::chrono_literals;
 using namespace std;
@@ -23,36 +24,37 @@ class MinimalPublisher : public rclcpp::Node
     {
       subscription_ = this->create_subscription<geometry_msgs::msg::Twist>(
       "topic_twist", 10, std::bind(&MinimalPublisher::calc, this, _1));
-      publisher_ = this->create_publisher<std_msgs::msg::Float32MultiArray>("topic_velocity", 10);
+      publisher_ = this->create_publisher<std_msgs::msg::String>("topic_velocity", 10);
     }
 
   private:
     void calc(geometry_msgs::msg::Twist twist)
     {
       /*
-      v.at(0):RF
-      v.at(1):LF  
-      v.at(2):LB
-      v.at(3):RB
+      v.at(0):FR
+      v.at(1):FL  
+      v.at(2):BL
+      v.at(3):BR
       */
-      std_msgs::msg::Float32MultiArray v; // velocity of wheels
-      vector<float> alpha(4);
+      std_msgs::msg::String message; // velocity of wheels
+      vector<float> v(4);
       float vx = twist.linear.x;
       float vy = twist.linear.y;
       rclcpp::Time now = rclcpp::Clock().now();
       theta += twist.angular.z * (now.nanoseconds() - past.nanoseconds())*1E-9;
       float vtheta = twist.angular.z;
       for (int i = 0; i < 4; i++) {
-        float velocity = -sin(theta + M_PI/2 * i) * vx + cos(theta + M_PI/2 * i) * vy + R * vtheta;
-        v.data.push_back(velocity);
+        v.at(i) = -sin(theta + M_PI/2 * i) * vx + cos(theta + M_PI/2 * i) * vy + R * vtheta;
       }
-      RCLCPP_INFO(this->get_logger(), "\nLF:%f  RF:%f\nLB:%f  RB:%f %f", v.data.at(1), v.data.at(0), v.data.at(2), v.data.at(3), (now.nanoseconds() - past.nanoseconds())*1E-9);
-      publisher_->publish(v);
+      RCLCPP_INFO(this->get_logger(), "FR%f  FL%f BL%f  BR%f", v.at(1), v.at(0), v.at(2), v.at(3), (now.nanoseconds() - past.nanoseconds())*1E-9);
+      message.data = "FR" + to_string(v.at(0)) + "FL" + to_string(v.at(1)) + "BL" + to_string(v.at(2)) + "BR" + to_string(v.at(3));
+      RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", message.data.c_str());
+      publisher_->publish(message);
       past = now;
     }
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_;
-    rclcpp::Publisher<std_msgs::msg::Float32MultiArray>::SharedPtr publisher_;
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
     size_t count_;
 };
 
