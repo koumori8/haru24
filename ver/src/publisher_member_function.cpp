@@ -11,7 +11,7 @@ using namespace std;
 using std::placeholders::_1;
 
 float theta = -M_PI/4; //robot orientation in global coordinates
-const float R = 0.5; //distance between the robot's center and a wheel
+const float R = 0.65 / M_SQRT2; //distance between the robot's center and a wheel
 rclcpp::Time past = rclcpp::Clock().now();
 
 
