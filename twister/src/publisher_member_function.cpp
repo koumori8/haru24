@@ -6,8 +6,8 @@
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include "sensor_msgs/msg/joy.hpp"
-const float SPEEDGAIN = 1.0;
-const float ANGULARSPEEDGAIN = 1.0;
+const float SPEEDGAIN = 0.2;
+const float ANGULARSPEEDGAIN = 0.5;
 using namespace std;
 using std::placeholders::_1;
 
