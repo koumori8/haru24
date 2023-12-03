@@ -24,7 +24,7 @@ class MinimalPublisher : public rclcpp::Node
     {
       subscription_ = this->create_subscription<geometry_msgs::msg::Twist>(
       "topic_twist", 10, std::bind(&MinimalPublisher::calc, this, _1));
-      publisher_ = this->create_publisher<std_msgs::msg::String>("topic_velocity", 10);
+      publisher_ = this->create_publisher<std_msgs::msg::String>("odrive_cmd", 10);
     }
 
   private:
